@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VVAProjectData",
+  "type": "object",
+  "required": [
+    "vvaVersion",
+    "timestamp",
+    "repository",
+    "repositoryPath",
+    "branch",
+    "analyzedCommit",
+    "author",
+    "commitMessage",
+    "summary",
+    "changedFiles",
+    "diff"
+  ],
+  "properties": {
+    "vvaVersion": { "type": "string" },
+    "timestamp": { "type": "string" },
+    "repository": { "type": "string" },
+    "repositoryPath": { "type": "string" },
+    "branch": { "type": "string" },
+    "analyzedCommit": { "type": "string" },
+    "parentCommit": { "type": ["string", "null"] },
+    "author": {
+      "type": "object",
+      "required": ["name", "email", "date"],
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "date": { "type": "string" }
+      }
+    },
+    "commitMessage": { "type": "string" },
+    "summary": {
+      "type": "object",
+      "required": ["filesChanged", "insertions", "deletions"],
+      "properties": {
+        "filesChanged": { "type": "integer" },
+        "insertions": { "type": "integer" },
+        "deletions": { "type": "integer" }
+      }
+    },
+    "changedFiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "status", "additions", "deletions", "content"],
+        "properties": {
+          "file": { "type": "string" },
+          "status": { "type": "string", "enum": ["A", "M", "D", "R"] },
+          "additions": { "type": "integer" },
+          "deletions": { "type": "integer" },
+          "content": { "type": "string" }
+        }
+      }
+    },
+    "diff": { "type": "string" },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

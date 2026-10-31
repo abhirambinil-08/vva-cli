@@ -1,0 +1,32 @@
+# Node.js dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+
+# Python Virtual Environments & Packages
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Sensitive Environment Configurations
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# VVA Runtime Logs & Cache
+*.log
+.vva/logs/
+.vva/output/*.tmp
+.vva/cache/
+
+# Operating System Metadata
+.DS_Store
+Thumbs.db

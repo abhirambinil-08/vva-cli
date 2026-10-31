@@ -1,0 +1,38 @@
+{
+  "releases": [
+    {
+      "releaseId": "rel-1793436444897",
+      "version": "1.0.0",
+      "timestamp": "2026-10-31T08:47:24.897Z",
+      "strategy": "incremental",
+      "purpose": "technical",
+      "commitsIncluded": 1,
+      "filesGenerated": [
+        {
+          "format": "pdf",
+          "filename": "applet_continuous_report.pdf",
+          "path": "/app/applet/.vva/output/applet_continuous_report.pdf",
+          "sizeBytes": 176909
+        },
+        {
+          "format": "docx",
+          "filename": "applet_continuous_synopsis.docx",
+          "path": "/app/applet/.vva/output/applet_continuous_synopsis.docx",
+          "sizeBytes": 188570
+        },
+        {
+          "format": "pptx",
+          "filename": "applet_continuous_presentation.pptx",
+          "path": "/app/applet/.vva/output/applet_continuous_presentation.pptx",
+          "sizeBytes": 183696
+        }
+      ],
+      "backedUpFiles": [
+        "/app/applet/.vva/history/backups/1793436444895/applet_continuous_report.pdf",
+        "/app/applet/.vva/history/backups/1793436444895/applet_continuous_synopsis.docx",
+        "/app/applet/.vva/history/backups/1793436444895/applet_continuous_presentation.pptx"
+      ],
+      "summary": "INCREMENTAL documentation update for 1 commits."
+    }
+  ]
+}

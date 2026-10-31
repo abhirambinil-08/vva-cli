@@ -1,0 +1,15 @@
+# VVA (Version & Workflow Automator)
+# Python AI Engine, Visual Intelligence & Document Generation Dependencies
+
+# AI Engine (NVIDIA NIM OpenAI-compatible API client)
+openai>=1.12.0
+python-dotenv>=1.0.0
+
+# Document Engine (PDF, DOCX, and PPTX report generation)
+reportlab>=4.1.0
+python-docx>=1.1.0
+python-pptx>=0.6.23
+
+# Visual Evidence & Data Charting Engine
+matplotlib>=3.7.0
+Pillow>=9.0.0

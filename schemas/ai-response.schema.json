@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VVAAIResponse",
+  "type": "object",
+  "required": [
+    "title",
+    "summary",
+    "purposeAndRationale",
+    "changedComponents",
+    "technicalChanges",
+    "technologies",
+    "architecturalImpact",
+    "observationsAndLimitations"
+  ],
+  "properties": {
+    "title": { "type": "string" },
+    "summary": { "type": "string" },
+    "purposeAndRationale": { "type": "string" },
+    "changedComponents": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "technicalChanges": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "technologies": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "architecturalImpact": { "type": "string" },
+    "observationsAndLimitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "confidenceScore": { "type": "number" },
+    "model": { "type": "string" },
+    "processingTimeMs": { "type": "number" }
+  }
+}

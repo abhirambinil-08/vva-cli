@@ -1,0 +1,8 @@
+{
+  "name": "VVA — Version & Workflow Automator",
+  "description": "AI-powered Git workflow orchestrator converting developer activity into technical reports, DOCX synopses, and presentations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
