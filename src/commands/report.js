@@ -70,13 +70,27 @@ export async function reportCommand(options = {}, cwd = process.cwd()) {
     throw new Error(`AI Engine verification failed: ${err.message}`);
   }
 
-  // 4. Stage 3/4: Invoke Python Document Generation Engine
+  // 4. Generate High-Resolution Visual Charts & Diagrams
+  const chartsDir = path.join(outputDir, 'charts');
+  await fs.mkdir(chartsDir, { recursive: true });
+  try {
+    await invokePythonModule(
+      'document_engine/chart_generator.py',
+      ['--input', projectDataPath, '--output-dir', chartsDir],
+      root
+    );
+  } catch (err) {
+    process.stderr.write(`[VVA Notice] Visual chart rendering skipped: ${err.message}\n`);
+  }
+
+  // 5. Stage 3/4: Invoke Python Document Generation Engine
   const docResultRaw = await invokePythonModule(
     'document_engine/document_engine.py',
     [
       '--ai-input', aiOutputPath,
       '--project-input', projectDataPath,
       '--output-dir', outputDir,
+      '--charts-dir', chartsDir,
       '--format', format,
       '--mode', 'commit'
     ],
