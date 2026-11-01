@@ -1,0 +1,15 @@
+{
+  "vvaVersion": "1.0.0",
+  "initializedAt": "2026-10-31T14:22:35.574Z",
+  "defaultFormat": "all",
+  "outputDir": ".vva/output",
+  "pythonBinary": "C:\\Users\\Abhira\\Desktop\\Projects\\vva-cli\\.venv\\Scripts\\python.exe",
+  "aiProvider": "nvidia",
+  "aiModel": "openai/gpt-oss-20b",
+  "maxDiffSizeBytes": 1048576,
+  "team": {
+    "orchestrator": "Abhiram Binil (Person 1)",
+    "aiEngine": "Vishnu G Pillai (Person 2)",
+    "documentEngine": "Vinay Bisht (Person 3)"
+  }
+}
