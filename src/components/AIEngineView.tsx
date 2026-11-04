@@ -58,6 +58,11 @@ export const AIEngineView: React.FC<AIEngineViewProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-emerald-950/50 border border-emerald-800/60 rounded text-[11px] text-emerald-300 font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>NVIDIA NIM Key: nvapi-vo4GLys7...3fc3V (Configured)</span>
+          </div>
+
           <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-lg border border-slate-800 text-xs">
             <button
               onClick={() => setProvider('nvidia')}
@@ -67,7 +72,7 @@ export const AIEngineView: React.FC<AIEngineViewProps> = ({
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              NVIDIA API (meta/llama-3.1-70b)
+              NVIDIA NIM ({vvaConfig.aiModel.split('/')[1] || 'llama-3.1-70b'})
             </button>
             <button
               onClick={() => setProvider('gemini')}
@@ -77,7 +82,7 @@ export const AIEngineView: React.FC<AIEngineViewProps> = ({
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              Gemini API (gemini-2.5-flash)
+              Gemini 2.5 Flash
             </button>
           </div>
 

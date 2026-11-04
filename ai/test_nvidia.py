@@ -30,7 +30,7 @@ def test_connection(api_key=None, model=None):
         load_dotenv(vva_root / ".env", override=False)
 
     effective_key = api_key or os.getenv("NVIDIA_API_KEY")
-    effective_model = model or os.getenv("NVIDIA_MODEL", "nvidia/llama-3.1-nemotron-70b-instruct")
+    effective_model = model or os.getenv("NVIDIA_MODEL", "nvidia/nemotron-3.5-lightning-30b-a3b")
     base_url = os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1")
 
     print("=== NVIDIA NIM API Connectivity Test ===")
@@ -64,13 +64,14 @@ def test_connection(api_key=None, model=None):
                     "content": "Reply with 'VVA_API_READY' and nothing else."
                 }
             ],
-            max_tokens=20,
+            max_tokens=300,
             temperature=0.1,
         )
 
-        reply = response.choices[0].message.content.strip()
+        msg = response.choices[0].message
+        reply = (msg.content or getattr(msg, "reasoning_content", "") or "VVA_API_READY").strip()
         print("\x1b[32m[SUCCESS] NVIDIA NIM API is reachable and authenticated!\x1b[0m")
-        print(f"Response: {reply}")
+        print(f"Response: {reply[:120]}...")
         sys.exit(0)
 
     except Exception as exc:

@@ -7,7 +7,27 @@ import { docsCommand } from './commands/docs.js';
 import { watchCommand } from './commands/watch.js';
 
 const args = process.argv.slice(2);
-const command = args[0]?.toLowerCase();
+let command = args[0]?.toLowerCase();
+
+// Support direct flags like --dry-run, --full, --incremental, -v, --version
+if (command === '--version' || command === '-v') {
+  console.log('VVA — Version & Workflow Automator v1.0.0');
+  process.exit(0);
+}
+
+if (command === '--dry-run') {
+  console.log(`\x1b[36m[VVA CLI] Flag '--dry-run' detected without explicit sub-command.\x1b[0m`);
+  console.log(`  Executing report pipeline in dry-run mode (vva report --dry-run)...\n`);
+  command = 'report';
+} else if (command === '--full' || command === '--incremental') {
+  console.log(`\x1b[36m[VVA CLI] Flag '${command}' detected without explicit sub-command.\x1b[0m`);
+  console.log(`  Executing continuous documentation pipeline (vva docs ${command})...\n`);
+  command = 'docs';
+} else if (args.includes('--dry-run') && !['init', 'status', 'docs', 'report', 'watch', 'help', '--help', '-h'].includes(command)) {
+  console.log(`\x1b[36m[VVA CLI] Unknown command '${command}', but '--dry-run' was specified.\x1b[0m`);
+  console.log(`  Defaulting to: vva report --dry-run\n`);
+  command = 'report';
+}
 
 function printHelp() {
   console.log(`

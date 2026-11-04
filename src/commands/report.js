@@ -10,14 +10,13 @@ export async function reportCommand(options = {}, cwd = process.cwd()) {
   const outputDir = path.join(vvaDir, 'output');
   const configFile = path.join(vvaDir, 'config.json');
 
-  // 1. Ensure .vva is initialized
+  // 1. Ensure .vva is initialized and output directory exists
+  await fs.mkdir(outputDir, { recursive: true });
   let config = {};
   try {
     const rawConfig = await fs.readFile(configFile, 'utf8');
     config = JSON.parse(rawConfig);
   } catch {
-    // Auto-create directory structure if running in uninitialized repo
-    await fs.mkdir(outputDir, { recursive: true });
     config = { defaultFormat: 'all', maxDiffSizeBytes: 1048576 };
   }
 

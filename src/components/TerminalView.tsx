@@ -104,8 +104,8 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
     setInputVal('');
 
     const parts = cmd.split(' ');
-    const mainCmd = parts[0].toLowerCase();
-    const subCmd = parts[1]?.toLowerCase();
+    let mainCmd = parts[0].toLowerCase();
+    let subCmd = parts[1]?.toLowerCase();
 
     setIsProcessing(true);
 
@@ -132,6 +132,18 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
       return;
     }
 
+    if (mainCmd === '--dry-run' || (mainCmd === 'vva' && subCmd === '--dry-run')) {
+      // Intelligently normalize --dry-run flag
+      setLogs(prev => [
+        ...prev,
+        { id: String(Date.now()), type: 'info', text: "[VVA CLI] Flag '--dry-run' detected without explicit sub-command." },
+        { id: String(Date.now() + 1), type: 'output', text: "  Executing report pipeline in dry-run mode (vva report --dry-run)..." }
+      ]);
+      mainCmd = 'vva';
+      subCmd = 'report';
+      if (!parts.includes('--dry-run')) parts.push('--dry-run');
+    }
+
     if (mainCmd === 'vva') {
       if (!subCmd) {
         setLogs(prev => [
@@ -148,16 +160,16 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
           setLogs(prev => [
             ...prev,
             { id: String(Date.now()), type: 'info', text: '[VVA Setup Manager] Starting intelligent cross-system initialization...' },
-            { id: String(Date.now() + 1), type: 'output', text: '  ✓ [Step 1/12] Operating System Detection: Linux (linux x64, kernel 4.19.0-gvisor)' },
-            { id: String(Date.now() + 2), type: 'output', text: '  ✓ [Step 2/12] Node.js & npm Verification: Node v22.23.4, npm 10.9.9' },
+            { id: String(Date.now() + 1), type: 'output', text: '  ✓ [Step 1/12] Operating System Detection: Linux (linux x64)' },
+            { id: String(Date.now() + 2), type: 'output', text: '  ✓ [Step 2/12] Node.js & npm Verification: Node v22.23.3, npm 10.9.9' },
             { id: String(Date.now() + 3), type: 'output', text: '  ✓ [Step 3/12] Python Runtime Discovery: Python 3.10.12 (python3)' },
             { id: String(Date.now() + 4), type: 'output', text: '  ℹ [Step 4/12] JavaScript Dependencies: Verified in node_modules/' },
-            { id: String(Date.now() + 5), type: 'output', text: '  ✓ [Step 5/12] Python Virtual Environment (.venv): Dedicated virtual environment ready at .venv/' },
-            { id: String(Date.now() + 6), type: 'output', text: '  ✓ [Step 6/12] Python Packages (requirements.txt): openai, reportlab, python-docx, python-pptx, python-dotenv' },
+            { id: String(Date.now() + 5), type: 'output', text: '  ✓ [Step 5/12] Python Virtual Environment: System Python with user site-packages' },
+            { id: String(Date.now() + 6), type: 'output', text: '  ✓ [Step 6/12] Python Packages (requirements.txt): openai, reportlab, python-docx, python-pptx, matplotlib, pillow, python-dotenv' },
             { id: String(Date.now() + 7), type: 'output', text: '  ✓ [Step 7/12] Engine Modules Validation: ai/ai_engine.py & document_engine.py ready' },
             { id: String(Date.now() + 8), type: 'output', text: '  ✓ [Step 8/12] Directory Structure Provisioning: Created .vva/ (output, logs)' },
             { id: String(Date.now() + 9), type: 'output', text: '  ✓ [Step 9/12] Configuration Management: Preserved existing .vva/config.json' },
-            { id: String(Date.now() + 10), type: 'output', text: '  ✓ [Step 10/12] NVIDIA API Credentials: Validated' },
+            { id: String(Date.now() + 10), type: 'output', text: '  ✓ [Step 10/12] NVIDIA API Credentials: Validated (nvapi-...fc3V configured)' },
             { id: String(Date.now() + 11), type: 'output', text: '  ✓ [Step 11/12] Installation Health Audit: All 4 critical subsystems verified' },
             { id: String(Date.now() + 12), type: 'success', text: '✓ SETUP COMPLETE — VVA is fully configured and ready for ' + currentRepo.name },
             { id: String(Date.now() + 13), type: 'output', text: "Run 'vva status' to inspect environment or 'vva report' to generate technical documents." }
@@ -173,7 +185,7 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
             ...prev,
             { id: String(Date.now()), type: 'info', text: '================ VVA SYSTEM & REPOSITORY STATUS ================' },
             { id: String(Date.now() + 1), type: 'output', text: `Operating System:   Linux (linux x64)` },
-            { id: String(Date.now() + 2), type: 'output', text: `Node.js Runtime:    v22.23.4 (npm 10.9.9)` },
+            { id: String(Date.now() + 2), type: 'output', text: `Node.js Runtime:    v22.23.3 (npm 10.9.9)` },
             { id: String(Date.now() + 3), type: 'output', text: `Repository:         ${currentRepo.name} (${currentRepo.path})` },
             { id: String(Date.now() + 4), type: 'output', text: `Active Branch:      ${currentRepo.currentBranch}` },
             { id: String(Date.now() + 5), type: 'output', text: `Latest Commit:      ${selectedCommit.hash}` },
@@ -181,8 +193,8 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
             { id: String(Date.now() + 7), type: 'output', text: `Author:             ${selectedCommit.author} <${selectedCommit.email}>` },
             { id: String(Date.now() + 8), type: 'output', text: `Files Changed:      ${selectedCommit.changedFiles.length} file(s) (+${selectedCommit.diffSummary.insertions} / -${selectedCommit.diffSummary.deletions})` },
             { id: String(Date.now() + 9), type: isInitialized ? 'success' : 'warn', text: `VVA Environment:    ${isInitialized ? '✓ Initialized (.vva/ directory configured)' : '! Not initialized (Run vva init)'}` },
-            { id: String(Date.now() + 10), type: 'output', text: `Python Runtime:     Python 3.10.12 [Dedicated .venv] (openai, reportlab, docx, pptx ready)` },
-            { id: String(Date.now() + 11), type: 'output', text: `NVIDIA API Key:     Configured via environment (${vvaConfig.aiProvider.toUpperCase()} / ${vvaConfig.aiModel})` },
+            { id: String(Date.now() + 10), type: 'output', text: `Python Runtime:     Python 3.10.12 (openai, reportlab, docx, pptx, matplotlib ready)` },
+            { id: String(Date.now() + 11), type: 'success', text: `NVIDIA API Key:     ✓ Configured (nvapi-vo4GLys7...3fc3V) via .env [NIM Model: ${vvaConfig.aiModel}]` },
             { id: String(Date.now() + 12), type: 'output', text: `Output Destination: ${vvaConfig.outputDir}/` },
             { id: String(Date.now() + 13), type: 'info', text: '================================================================' }
           ]);
@@ -212,6 +224,24 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
         const formatArg = parts.find(p => p.startsWith('--format='))?.split('=')[1] || 
                           (parts.includes('--format') ? parts[parts.indexOf('--format') + 1] : 'all');
         const isDryRun = parts.includes('--dry-run');
+
+        if (isDryRun) {
+          setTimeout(() => {
+            setLogs(prev => [
+              ...prev,
+              { id: String(Date.now()), type: 'info', text: '[Stage 1/4] Git Data Collector: Inspecting commit HEAD...' },
+              { id: String(Date.now() + 1), type: 'output', text: `[Stage 1/4] Git Collector: Querying commit ${selectedCommit.shortHash} on ${currentRepo.currentBranch}...` },
+              { id: String(Date.now() + 2), type: 'output', text: `[Stage 1/4] Git Collector: Collected ${selectedCommit.changedFiles.length} files. State: M=${selectedCommit.changedFiles.filter(f => f.status === 'M').length}, A=${selectedCommit.changedFiles.filter(f => f.status === 'A').length}, D=${selectedCommit.changedFiles.filter(f => f.status === 'D').length}` },
+              { id: String(Date.now() + 3), type: 'output', text: '[Stage 2/4] Orchestrator: Built .vva/output/project-data.json payload (Validated schema ✓)' },
+              { id: String(Date.now() + 4), type: 'success', text: `✓ Dry-run completed. Saved project data to ${vvaConfig.outputDir}/project-data.json` },
+              { id: String(Date.now() + 5), type: 'output', text: `  Analyzed commit: ${selectedCommit.shortHash} (${selectedCommit.changedFiles.length} files)` },
+              { id: String(Date.now() + 6), type: 'output', text: "  To generate complete reports, configure your NVIDIA API key and run 'vva report'." },
+              { id: String(Date.now() + 7), type: 'info', text: "  ✓ NVIDIA API Key is configured (nvapi-...fc3V)! Run 'vva report' for live AI synthesis & multi-format export." }
+            ]);
+            setIsProcessing(false);
+          }, 350);
+          return;
+        }
 
         setLogs(prev => [
           ...prev,
@@ -248,6 +278,29 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
       if (subCmd === 'docs') {
         const isFull = parts.includes('--full');
         const purpose = parts.find(p => p.startsWith('--purpose='))?.split('=')[1] || 'technical';
+        const isDryRun = parts.includes('--dry-run');
+
+        if (isDryRun) {
+          setTimeout(() => {
+            setLogs(prev => [
+              ...prev,
+              { id: String(Date.now()), type: 'info', text: `[VVA Continuous Docs] Initiating ${isFull ? 'FULL' : 'INCREMENTAL'} project documentation (${purpose})...` },
+              { id: String(Date.now() + 1), type: 'output', text: `  Target Purpose: ${purpose} | Formats: all | Dry-run: true` },
+              { id: String(Date.now() + 2), type: 'output', text: `  Step 1/3: Synchronizing cumulative project history... [OK]` },
+              { id: String(Date.now() + 3), type: 'output', text: `  Step 2/3: Cataloging visual evidence (Screenshots & Charts)... [4 assets found]` },
+              { id: String(Date.now() + 4), type: 'output', text: `  Step 3/3: Rendering high-resolution Matplotlib charts to ${vvaConfig.outputDir}/charts... [OK]` },
+              { id: String(Date.now() + 5), type: 'success', text: `✓ Continuous Docs Dry-Run Succeeded!` },
+              { id: String(Date.now() + 6), type: 'output', text: `  Commits in History:    ${currentRepo.commits.length}` },
+              { id: String(Date.now() + 7), type: 'output', text: `  Visual Evidence Found: 4 assets` },
+              { id: String(Date.now() + 8), type: 'output', text: `  Charts Generated:      ${vvaConfig.outputDir}/charts` },
+              { id: String(Date.now() + 9), type: 'output', text: `  History Stored At:     .vva/history/project-history.json` },
+              { id: String(Date.now() + 10), type: 'info', text: "  NVIDIA API Key: Configured (nvapi-...fc3V) ✓ Run 'vva docs' without --dry-run for complete releases." }
+            ]);
+            setIsProcessing(false);
+          }, 350);
+          return;
+        }
+
         setLogs(prev => [
           ...prev,
           { id: String(Date.now()), type: 'info', text: `[VVA Continuous Docs] Initiating ${isFull ? 'FULL' : 'INCREMENTAL'} project documentation (${purpose})...` },
@@ -273,6 +326,7 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
       setIsProcessing(false);
       return;
     }
+
 
     if (mainCmd === 'git') {
       if (subCmd === 'log') {
@@ -385,6 +439,12 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
             vva report
           </button>
           <button
+            onClick={() => handleCommand('vva report --dry-run')}
+            className="px-2.5 py-1 text-xs font-mono font-medium bg-cyan-950 hover:bg-cyan-900/60 text-cyan-300 rounded border border-cyan-800/60 transition-colors"
+          >
+            --dry-run
+          </button>
+          <button
             onClick={() => handleCommand('vva watch')}
             className={`px-2.5 py-1 text-xs font-mono font-medium rounded border transition-colors ${
               isWatchMode 
@@ -394,12 +454,10 @@ export const TerminalView: React.FC<TerminalViewProps> = ({
           >
             {isWatchMode ? 'Stop watch' : 'vva watch'}
           </button>
-          <button
-            onClick={() => handleCommand('git log -n 3')}
-            className="px-2.5 py-1 text-xs font-mono font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700/60 transition-colors"
-          >
-            git log
-          </button>
+          <div className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 bg-emerald-950/60 border border-emerald-800/50 rounded text-[11px] text-emerald-400 font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>NVIDIA: nvapi-...fc3V</span>
+          </div>
           <button
             onClick={() => setLogs([])}
             title="Clear Terminal"

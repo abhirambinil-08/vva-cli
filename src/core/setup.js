@@ -200,10 +200,11 @@ export function getVenvPaths(baseDir) {
 export async function setupVirtualEnvironment(vvaRoot, systemPythonBin) {
   const { venvDir, pythonExecutable, pipExecutable } = getVenvPaths(vvaRoot);
 
-  // Check if .venv already exists and has working python
+  // Check if .venv already exists and has working python and packages
   if (fsSync.existsSync(pythonExecutable)) {
     const testExec = await runProc(pythonExecutable, ['--version']);
-    if (testExec.success) {
+    const testImports = await runProc(pythonExecutable, ['-c', 'import openai; import reportlab; import docx; import pptx; import dotenv']);
+    if (testExec.success && testImports.success) {
       return {
         status: 'skipped',
         venvDir,
@@ -215,6 +216,20 @@ export async function setupVirtualEnvironment(vvaRoot, systemPythonBin) {
     }
   }
 
+  // Check if system python already has all requirements
+  const sysProbe = await runProc(systemPythonBin, ['-c', 'import openai; import reportlab; import docx; import pptx; import dotenv']);
+  if (sysProbe.success) {
+    const sysVer = await runProc(systemPythonBin, ['--version']);
+    return {
+      status: 'skipped',
+      venvDir: null,
+      pythonExecutable: systemPythonBin,
+      pipExecutable: 'pip3',
+      version: sysVer.stdout,
+      message: `System Python (${systemPythonBin}) verified with all required packages`,
+    };
+  }
+
   if (!systemPythonBin) {
     throw new Error('System Python 3.8+ is required to create virtual environment.');
   }
@@ -224,8 +239,9 @@ export async function setupVirtualEnvironment(vvaRoot, systemPythonBin) {
     cwd: vvaRoot,
   });
 
-  // 2. If ensurepip is missing (common on Debian/Ubuntu minimal images), retry with --without-pip
-  if (!venvRes.success && (venvRes.stderr.includes('ensurepip') || venvRes.stderr.includes('python3-venv'))) {
+  // 2. If standard venv fails, retry with --without-pip
+  const combinedOutput = `${venvRes.stderr} ${venvRes.stdout}`.toLowerCase();
+  if (!venvRes.success) {
     venvRes = await runProc(systemPythonBin, ['-m', 'venv', '--without-pip', venvDir], {
       cwd: vvaRoot,
     });
@@ -254,14 +270,33 @@ export async function setupVirtualEnvironment(vvaRoot, systemPythonBin) {
     }
   }
 
+  // If virtualenv still failed, fallback to system Python if packages or python are available
   if (!venvRes.success) {
-    throw new Error(`Failed to create virtual environment at ${venvDir}: ${venvRes.stderr}`);
+    const sysTest = await runProc(systemPythonBin, ['--version']);
+    if (sysTest.success) {
+      return {
+        status: 'fallback',
+        venvDir: null,
+        pythonExecutable: systemPythonBin,
+        pipExecutable: 'pip3',
+        version: sysTest.stdout,
+        message: `Using system Python (${systemPythonBin})`,
+      };
+    }
+    throw new Error(`Failed to create virtual environment at ${venvDir}: ${venvRes.stderr || venvRes.stdout}`);
   }
 
   // Verify created python executable
   const verifyRes = await runProc(pythonExecutable, ['--version']);
   if (!verifyRes.success) {
-    throw new Error(`Virtual environment created but Python binary failed to execute: ${verifyRes.stderr}`);
+    return {
+      status: 'fallback',
+      venvDir: null,
+      pythonExecutable: systemPythonBin,
+      pipExecutable: 'pip3',
+      version: systemPythonBin,
+      message: `Using system Python (${systemPythonBin})`,
+    };
   }
 
   return {
